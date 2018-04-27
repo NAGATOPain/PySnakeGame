@@ -1,0 +1,90 @@
+import pygame
+from src.Elements.snake import *
+from src.Elements.food import *
+
+pygame.init()
+pygame.font.init()
+
+# Constants defining
+
+# Game play grid is 500x500, with an element contains 25x25
+
+SIZE = WIDTH, HEIGHT = 500, 600
+# Gray color
+BACKGROUND_COLOR = (220, 220, 220)
+# Score space color - white
+SCORE_COLOR = (255, 255, 255)
+# Font color
+FONT_COLOR = (0, 0, 0)
+
+# Variables defining
+gameExit = False
+clock = pygame.time.Clock()
+gameScore = 0
+scoreFont = pygame.font.SysFont("arial", 24)
+scoreFont.set_bold(True)
+snake = Snake()
+food = Food()
+
+# Game setup
+pygame.display.set_caption('Snake Game V1 - NTL')
+gameDisplay = pygame.display.set_mode(SIZE)
+
+while not gameExit:
+    pygame.time.delay(60)
+    # Event handling
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_DOWN:
+                if snake.get_direction() != 3:
+                    snake.set_direction(4)
+            elif event.key == pygame.K_UP:
+                if snake.get_direction() != 4:
+                    snake.set_direction(3)
+            elif event.key == pygame.K_RIGHT:
+                if snake.get_direction() != 1:
+                    snake.set_direction(2)
+            elif event.key == pygame.K_LEFT:
+                if snake.get_direction() != 2:
+                    snake.set_direction(1)
+            else:
+                pass
+        else:
+            pass
+
+    # Fill the entire game's background color
+    gameDisplay.fill(BACKGROUND_COLOR)
+    # Fill the score space color
+    pygame.draw.rect(gameDisplay, SCORE_COLOR, (0, 0, WIDTH, 100))
+    # Draw label
+    scoreText = scoreFont.render("Score: "+str(gameScore), True, FONT_COLOR)
+
+    gameDisplay.blit(scoreText, (50, 50 - scoreText.get_height() // 2))
+
+    # Draw Food
+    pygame.draw.rect(gameDisplay, food.get_color(), food.get_pos())
+
+    # Draw snake
+    snake.move()
+    for i in snake.get_element():
+        pygame.draw.rect(gameDisplay, snake.get_color(), i)
+
+    if snake.get_element()[snake.get_length() - 1] == food.get_pos():
+        gameScore += 1
+        snake.gender_new_element()
+        food.generate()
+
+    if snake.is_die():
+        pygame.draw.rect(gameDisplay, SCORE_COLOR, (0, 0, WIDTH, 100))
+        scoreText = scoreFont.render("Game over ! Your Score: " + str(gameScore), True, FONT_COLOR)
+        gameDisplay.blit(scoreText, (50, 50 - scoreText.get_height() // 2))
+        gameExit = True
+
+    pygame.display.update()
+
+pygame.time.delay(1000)
+pygame.quit()
+exit()
